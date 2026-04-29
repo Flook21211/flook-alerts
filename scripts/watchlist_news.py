@@ -128,7 +128,6 @@ searches = {
     'Dividend': search_news(f'{dividend} stock news {today}', 5),
     'Speculative': search_news(f'{speculative} stock news {today}', 10),
 }
-}
 
 search_context = '\n\n'.join([f"=== {k} ===\n{v}" for k, v in searches.items()])
 
