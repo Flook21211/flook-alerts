@@ -109,7 +109,7 @@ searches = {
     'USD/THB': search_news(f'USD THB dollar baht exchange rate today {today}', 3),
     'VIX': search_news(f'VIX volatility fear index market today {today}', 3),
     'Oil': search_news(f'crude oil WTI Brent price today {today}', 3),
-    'Earnings': search_news(f'earnings report results this week {growth1}', 10),
+    'Earnings': search_news(f'earnings report results this week {growth1}', 15),
     'Growth1': search_news(f'{growth1} stock news {today}', 10),
     'Growth2': search_news(f'{growth2} stock news {today}', 10),
     'Growth3': search_news(f'{growth3} stock news {today}', 10),
