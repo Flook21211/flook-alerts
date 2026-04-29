@@ -1,7 +1,7 @@
 {
   "watchlist": {
     "stocks": {
-      "Growth": ["NVDA","MSFT","CRWD","PLTR","TSM","ASML","ARM","AMD","AVGO","AAPL","FICO","TSLA","AMZN","HIMS","META","GOOGL","NFLX","MRVL","CSCO","MU","LRCX","INTC","AMD","SNPS","CDNS","ONTO","AMAT","KLAC","EOSE","ONDS","ASTS","PANW","SHOP","BE","NXT","BA","GE","RTX","ABBV","APP","ZETA","UBER","OKLO"],
+      "Growth": ["NVDA","MSFT","CRWD","PLTR","TSM","ASML","ARM","AMD","AVGO","AAPL","FICO","TSLA","AMZN","HIMS","META","GOOGL","NFLX","MRVL","CSCO","MU","LRCX","INTC","SNPS","CDNS","ONTO","AMAT","KLAC","EOSE","ONDS","ASTS","PANW","SHOP","BE","NXT","BA","GE","RTX","ABBV","APP","ZETA","UBER","OKLO"],
       "Defensive": ["COST","LLY","NVO","ISRG","UNH","NEE","PEP","KO","WMT","PG","BRK.B","V","MRK","LMT","WM","DUK"],
       "Dividend": ["PFE","CVX","XOM","O"],
       "Speculative": ["RKLB","TEM","NVTS","NBIS","SOFI","ENPH","FSLR"]
