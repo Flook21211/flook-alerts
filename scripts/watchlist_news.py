@@ -38,32 +38,39 @@ ctx = '\n\n'.join([
     f"=== Watchlist ===\n{search(f'NVDA MSFT META GOOGL AAPL TSLA AVGO TSM ASML stock news {today}')}",
 ])
 
-prompt = f"""คุณคือ AI ช่วยนักลงทุนไทย วันนี้คือ {date_str}
+prompt = f"""คุณคือ AI นักหาข่าวและวิเคราะห์ช่วยนักลงทุนไทย วันนี้คือ {date_str}
 ข้อมูลข่าว:
 {ctx}
 
 watchlist: {', '.join(all_stocks)}
 
-สร้างข้อความส่ง LINE ตามรูปแบบนี้ (ห้ามเกิน 1500 ตัวอักษร ตอบแค่ข้อความเท่านั้น):
+สร้างข้อความส่ง LINE ตามรูปแบบนี้ (ตอบแค่ข้อความเท่านั้น ห้ามเกิน 4000 ตัวอักษร):
 📊 Watchlist News Alert
 📅 {date_str}
 ━━━━━━━━━━━━━━━━━
-🚨 EARNINGS WEEK (ถ้ามี)
-[หุ้น + วัน]
+🚨 EARNINGS WEEK (ถ้ามี ระบุวันที่ชัดเจน)
+[หุ้น — วันที่จริง — consensus EPS ถ้ามี]
 ━━━━━━━━━━━━━━━━━
-📌 ข่าวหุ้นใน Watchlist
-🟢 [ticker] — [ข่าวดี]
-🔴 [ticker] — [ข่าวร้าย]
-⚪ [ticker] — [ข่าวกลาง]
+📌 ข่าวหุ้นใน Watchlist (อย่างน้อย 5-7 ตัว แต่ละตัวอธิบาย 2-3 ประโยค )
+
+🟢 [ticker] — [อธิบาย 2-3 ประโยค พร้อมสาเหตุที่หุ้นขึ้น]
+🔴 [ticker] — [อธิบาย 2-3 ประโยค พร้อมสาเหตุที่หุ้นลง]
+⚪ [ticker] — [อธิบาย 2-3 ประโยค]
+
 ━━━━━━━━━━━━━━━━━
-🌍 Macro
-- [5 ข้อ]
-💡 จับตา: [...]"""
+🌍 Macro (อธิบายแต่ละข้อ 5 ประโยค พร้อมตัวเลขจริง)
+
+- Fed: [รายละเอียด + ตัวเลขดอกเบี้ย]
+- BOT: [รายละเอียด + ตัวเลข]
+- ทองคำ: [ราคา + แนวโน้ม]
+- ตลาดสหรัฐฯ: [ภาพรวม + ตัวเลข index]
+
+💡 จับตา: [5 ประเด็นที่ต้องติดตามวันนี้]"""
 
 resp = requests.post(
     'https://api.groq.com/openai/v1/chat/completions',
     headers={'Authorization': f'Bearer {GROQ_API_KEY}', 'Content-Type': 'application/json'},
-    json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt}], 'max_tokens': 2000},
+    json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt}], 'max_tokens': 2500},
     timeout=30)
 msg = resp.json()['choices'][0]['message']['content'].strip()
 
