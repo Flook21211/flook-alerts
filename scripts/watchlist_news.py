@@ -73,7 +73,7 @@ def get_tech_data(tickers):
     for ticker in tickers:
         try:
             t = yf.Ticker(ticker)
-            hist = t.history(period='3mo')
+            hist = t.history(period='6mo')
             if hist.empty:
                 continue
             price = round(hist['Close'].iloc[-1], 2)
@@ -84,14 +84,17 @@ def get_tech_data(tickers):
             ma50_status = 'above MA50' if price > ma50 else 'below MA50'
             chg_str = f'+{chg}%' if chg >= 0 else f'{chg}%'
             rsi_str = f'RSI {rsi}' if rsi else 'RSI N/A'
-            ma200 = round(hist['Close'].rolling(200).mean().iloc[-1], 2) if len(hist) >= 200 else None
-ma200_label = 'above MA200' if price > ma200 else 'below MA200'
-ma200_status = f" | {ma200_label}" if ma200 else ''
-avg_vol = int(hist['Volume'].rolling(20).mean().iloc[-1])
-today_vol = int(hist['Volume'].iloc[-1])
-vol_ratio = round(today_vol / avg_vol, 1) if avg_vol > 0 else 0
-vol_str = f"Vol {vol_ratio}x avg"
-lines.append(f"{ticker}: ${price} ({chg_str}) | {rsi_str} | {ma50_status}{ma200_status} | {vol_str}")
+            if len(hist) >= 200:
+                ma200 = round(hist['Close'].rolling(200).mean().iloc[-1], 2)
+                ma200_label = 'above MA200' if price > ma200 else 'below MA200'
+                ma200_status = f' | {ma200_label}'
+            else:
+                ma200_status = ''
+            avg_vol = int(hist['Volume'].rolling(20).mean().iloc[-1])
+            today_vol = int(hist['Volume'].iloc[-1])
+            vol_ratio = round(today_vol / avg_vol, 1) if avg_vol > 0 else 0
+            vol_str = f'Vol {vol_ratio}x avg'
+            lines.append(f"{ticker}: ${price} ({chg_str}) | {rsi_str} | {ma50_status}{ma200_status} | {vol_str}")
         except Exception as e:
             lines.append(f"{ticker}: (error: {e})")
     return '\n'.join(lines)
