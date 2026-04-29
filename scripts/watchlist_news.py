@@ -11,7 +11,7 @@ try:
 except ImportError:
     HAS_YF = False
 
-# --- Config from GitHub Secrets ---
+# --- Config ---
 GROQ_API_KEY = os.environ['GROQ_API_KEY']
 SERPER_API_KEY = os.environ['SERPER_API_KEY']
 LINE_TOKEN = os.environ['LINE_TOKEN']
@@ -25,7 +25,7 @@ all_stocks = []
 for category, tickers in data['watchlist']['stocks'].items():
     all_stocks.extend(tickers)
 
-# --- Date in Thai ---
+# --- Date ---
 tz = pytz.timezone('Asia/Bangkok')
 now = datetime.now(tz)
 thai_months = {
@@ -35,9 +35,11 @@ thai_months = {
 }
 thai_year = now.year + 543
 date_str = f"{now.day} {thai_months[now.month]} {thai_year}"
+month_year = now.strftime('%B %Y')
+today = now.strftime('%Y-%m-%d')
 
 
-# --- Search news ---
+# --- Search ---
 def search_news(query, num=10):
     try:
         resp = requests.post(
@@ -49,10 +51,10 @@ def search_news(query, num=10):
         results = resp.json().get('news', [])
         return '\n'.join([f"- {r['title']}: {r.get('snippet', '')}" for r in results[:num]])
     except Exception as e:
-        return f"(ค้นไม่ได้: {e})"
+        return f"(error: {e})"
 
 
-# --- Calculate RSI ---
+# --- RSI ---
 def calc_rsi(prices, period=14):
     try:
         delta = prices.diff()
@@ -61,11 +63,11 @@ def calc_rsi(prices, period=14):
         rs = gain / loss
         rsi = 100 - (100 / (1 + rs))
         return round(rsi.iloc[-1], 1)
-    except:
+    except Exception:
         return None
 
 
-# --- Fetch technical data ---
+# --- Technical data ---
 def get_tech_data(tickers):
     lines = []
     for ticker in tickers:
@@ -78,37 +80,26 @@ def get_tech_data(tickers):
             prev = round(hist['Close'].iloc[-2], 2)
             chg = round((price - prev) / prev * 100, 2)
             ma50 = round(hist['Close'].rolling(50).mean().iloc[-1], 2)
-            ma200 = round(hist['Close'].rolling(200).mean().iloc[-1], 2) if len(hist) >= 200 else None
             rsi = calc_rsi(hist['Close'])
-
-            ma50_status = '✅ เหนือ MA50' if price > ma50 else '❌ ต่ำกว่า MA50'
-            ma200_status = ''
-            if ma200:
-                ma200_status = ' | ✅ เหนือ MA200' if price > ma200 else ' | ❌ ต่ำกว่า MA200'
-
+            ma50_status = 'above MA50' if price > ma50 else 'below MA50'
             chg_str = f'+{chg}%' if chg >= 0 else f'{chg}%'
             rsi_str = f'RSI {rsi}' if rsi else 'RSI N/A'
-
-            lines.append(f"{ticker}: ${price} ({chg_str}) | {rsi_str} | {ma50_status}{ma200_status}")
+            lines.append(f"{ticker}: ${price} ({chg_str}) | {rsi_str} | {ma50_status}")
         except Exception as e:
-            lines.append(f"{ticker}: (ดึงข้อมูลไม่ได้: {e})")
+            lines.append(f"{ticker}: (error: {e})")
     return '\n'.join(lines)
 
 
-month_year = now.strftime('%B %Y')
-today = now.strftime('%Y-%m-%d')
-top_stocks = ' '.join(all_stocks[:15])
-
-    # แบ่งหุ้นเป็นกลุ่มย่อยสำหรับ search
+# --- Stock groups ---
 growth1 = 'NVDA MSFT CRWD PLTR TSM ASML ARM AMD AVGO AAPL FICO TSLA'
 growth2 = 'AMZN HIMS META GOOGL NFLX MRVL CSCO MU LRCX INTC'
 growth3 = 'SNPS CDNS ONTO AMAT KLAC PANW SHOP APP ZETA UBER'
 growth4 = 'EOSE ONDS ASTS BE NXT BA GE RTX ABBV OKLO'
-defensive = 'COST LLY NVO ISRG UNH NEE PEP KO WMT PG BRK.B V MRK LMT WM DUK'
+defensive = 'COST LLY NVO ISRG UNH NEE PEP KO WMT PG V MRK LMT WM DUK'
 dividend = 'PFE CVX XOM O'
 speculative = 'RKLB TEM NVTS NBIS SOFI ENPH FSLR'
 
-# --- Run searches 
+# --- Searches ---
 searches = {
     'Fed/FOMC': search_news(f'Fed FOMC interest rate decision policy {month_year}', 5),
     'BOT': search_news(f'Bank of Thailand interest rate monetary policy {month_year}', 3),
@@ -118,7 +109,7 @@ searches = {
     'USD/THB': search_news(f'USD THB dollar baht exchange rate today {today}', 3),
     'VIX': search_news(f'VIX volatility fear index market today {today}', 3),
     'Oil': search_news(f'crude oil WTI Brent price today {today}', 3),
-    'Earnings': search_news(f'earnings report results this week {growth1}', 5),
+    'Earnings': search_news(f'earnings report results this week {growth1}', 10),
     'Growth1': search_news(f'{growth1} stock news {today}', 10),
     'Growth2': search_news(f'{growth2} stock news {today}', 10),
     'Growth3': search_news(f'{growth3} stock news {today}', 10),
@@ -130,83 +121,114 @@ searches = {
 
 search_context = '\n\n'.join([f"=== {k} ===\n{v}" for k, v in searches.items()])
 
-# --- Fetch technical data for key stocks ---
-key_stocks = all_stocks
+# --- Technical ---
 tech_data = ''
 if HAS_YF:
     print("Fetching technical data...")
-    tech_data = get_tech_data(key_stocks)
+    tech_data = get_tech_data(all_stocks)
     print(tech_data)
 
-# --- Groq summarize ---
-prompt = f"""คุณคือ AI ช่วยนักลงทุนไทย สรุปข่าวเป็นภาษาไทย กระชับ อ่านง่าย
-วันนี้คือ {date_str}
+# --- Groq call ---
+def call_groq(prompt_text):
+    resp = requests.post(
+        'https://api.groq.com/openai/v1/chat/completions',
+        headers={
+            'Authorization': f'Bearer {GROQ_API_KEY}',
+            'Content-Type': 'application/json'
+        },
+        json={
+            'model': 'llama-3.3-70b-versatile',
+            'messages': [{'role': 'user', 'content': prompt_text}],
+            'max_tokens': 3000,
+            'temperature': 0.3
+        },
+        timeout=60
+    )
+    result = resp.json()
+    print("Groq:", result)
+    return result['choices'][0]['message']['content'].strip()
 
-ข้อมูลข่าวล่าสุด:
+
+# --- Prompt หุ้น ---
+prompt_stocks = f"""คุณคือ AI ช่วยนักลงทุนไทย วันนี้คือ {date_str}
+
+ข้อมูลข่าว:
 {search_context}
 
-ข้อมูล Technical (ราคา, % เปลี่ยน, RSI, MA50, MA200):
-{tech_data if tech_data else '(ไม่มีข้อมูล technical)'}
+ข้อมูล Technical:
+{tech_data if tech_data else '(ไม่มีข้อมูล)'}
 
-หุ้นใน watchlist: {', '.join(all_stocks)}
-
-สร้างข้อความตามรูปแบบนี้ (ตอบแค่ข้อความเท่านั้น ไม่ต้องอธิบายเพิ่ม ไม่เกิน 4000 ตัวอักษร):
+สร้างข้อความ (ตอบแค่ข้อความเท่านั้น ไม่เกิน 3000 ตัวอักษร):
 
 📊 Watchlist News Alert
 📅 {date_str}
 ━━━━━━━━━━━━━━━━━
-[ถ้ามี earnings วันนี้/สัปดาห์นี้ ใส่:]
+[ถ้ามี earnings ใส่:]
 🚨 EARNINGS WEEK
 [ticker — วันที่ — EPS ถ้ามี]
 ━━━━━━━━━━━━━━━━━
 📌 ข่าว + ทิศทางหุ้น
-(ใส่ 15-20 ตัว แต่ละตัว 2-3 ประโยค + ทิศทาง)
+(ใส่ให้ครบ 20 ตัวจากทุก category แต่ละตัว 1-2 ประโยค)
 
-🟢📈 [ticker] $[ราคา] — [ข่าวดี + RSI + MA บอกทิศทาง]
-🔴📉 [ticker] $[ราคา] — [ข่าวร้าย + RSI + MA บอกทิศทาง]
-⚪➡️ [ticker] $[ราคา] — [ข่าวกลาง + RSI + MA บอกทิศทาง]
-
-━━━━━━━━━━━━━━━━━
-📊 สรุปทิศทาง (Bias วันนี้)
-
-📈 Bullish: [ticker, ticker, ...]
-📉 Bearish: [ticker, ticker, ...]
-➡️ Neutral: [ticker, ticker, ...]
+🟢📈 [ticker] $[ราคา] ([%]) RSI[xx] — [ข่าว + ทิศทาง]
+🔴📉 [ticker] $[ราคา] ([%]) RSI[xx] — [ข่าว + ทิศทาง]
+⚪➡️ [ticker] $[ราคา] ([%]) RSI[xx] — [ข่าว + ทิศทาง]
 
 ━━━━━━━━━━━━━━━━━
-🌍 Macro
+📊 Bias วันนี้
+📈 Bullish: [ticker, ...]
+📉 Bearish: [ticker, ...]
+➡️ Neutral: [ticker, ...]"""
 
+# --- Prompt Macro ---
+prompt_macro = f"""คุณคือ AI ช่วยนักลงทุนไทย วันนี้คือ {date_str}
+
+ข้อมูลข่าว Macro:
+=== Fed/FOMC ===
+{searches.get('Fed/FOMC', '')}
+
+=== BOT ===
+{searches.get('BOT', '')}
+
+=== US Market ===
+{searches.get('US Market', '')}
+
+=== DXY ===
+{searches.get('DXY', '')}
+
+=== USD/THB ===
+{searches.get('USD/THB', '')}
+
+=== VIX ===
+{searches.get('VIX', '')}
+
+=== Oil ===
+{searches.get('Oil', '')}
+
+=== Gold ===
+{searches.get('Gold', '')}
+
+สร้างข้อความ (ตอบแค่ข้อความเท่านั้น ไม่เกิน 1500 ตัวอักษร):
+
+🌍 Macro Report
+📅 {date_str}
+━━━━━━━━━━━━━━━━━
 🏦 Fed/FOMC: [สรุปนโยบายดอกเบี้ย]
 🏦 BOT: [สรุปธนาคารแห่งประเทศไทย]
 📈 S&P500/Nasdaq: [ทิศทางตลาด]
-💵 DXY: [ค่า Dollar Index + ทิศทาง]
-💱 USD/THB: [อัตราแลกเปลี่ยน]
-😱 VIX: [ระดับ VIX + ความหมาย]
-🛢️ Oil: [ราคาน้ำมัน WTI/Brent]
-🥇 Gold: [ราคาทอง]
+💵 DXY: [ค่า + ทิศทาง]
+💱 USD/THB: [อัตรา]
+😱 VIX: [ระดับ + ความหมาย]
+🛢️ Oil: [ราคา WTI/Brent]
+🥇 Gold: [ราคา]
+━━━━━━━━━━━━━━━━━
+💡 จับตา: [5 สิ่งสำคัญวันนี้]"""
 
-💡 จับตา: [5 สิ่งสำคัญที่ต้องติดตามวันนี้]"""
+# --- Generate messages ---
+msg_stocks = call_groq(prompt_stocks)
+msg_macro = call_groq(prompt_macro)
 
-groq_resp = requests.post(
-    'https://api.groq.com/openai/v1/chat/completions',
-    headers={
-        'Authorization': f'Bearer {GROQ_API_KEY}',
-        'Content-Type': 'application/json'
-    },
-    json={
-        'model': 'llama-3.3-70b-versatile',
-        'messages': [{'role': 'user', 'content': prompt}],
-        'max_tokens': 4000,
-        'temperature': 0.3
-    },
-    timeout=60
-)
-
-result = groq_resp.json()
-print("Groq response:", result)
-message = result['choices'][0]['message']['content'].strip()
-
-# --- Send LINE ---
+# --- LINE ส่ง 2 ข้อความ ---
 line_resp = requests.post(
     'https://api.line.me/v2/bot/message/push',
     headers={
@@ -215,10 +237,14 @@ line_resp = requests.post(
     },
     json={
         'to': LINE_USER_ID,
-        'messages': [{'type': 'text', 'text': message}]
+        'messages': [
+            {'type': 'text', 'text': msg_stocks},
+            {'type': 'text', 'text': msg_macro}
+        ]
     },
     timeout=10
 )
 
 print(f"LINE status: {line_resp.status_code}")
-print(message)
+print(msg_stocks)
+print(msg_macro)
