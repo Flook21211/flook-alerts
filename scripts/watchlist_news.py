@@ -118,7 +118,11 @@ search_context = '\n\n'.join([f"=== {k} ===\n{v}" for k, v in searches.items()])
 
 # --- Fetch technical data for key stocks ---
 key_stocks = ['NVDA', 'MSFT', 'META', 'GOOGL', 'AAPL', 'TSLA', 'AVGO', 'TSM',
-              'AMZN', 'CRWD', 'PLTR', 'ARM', 'AMD', 'ASML', 'NFLX', 'COST']
+              'AMZN', 'CRWD', 'PLTR', 'ARM', 'AMD', 'ASML', 'NFLX', 'COST',
+              'MRVL','CSCO','MU','LRCX','INTC','AMD','SNPS','CDNS','ONTO','AMAT',
+              'KLAC','EOSE','ONDS','ASTS','PANW','SHOP','BE','NXT','BA','GE','RTX',
+              'ABBV','APP','ZETA','UBER','OKLO','LLY', 'UNH', 'V', 'WMT', 'ISRG', 'PFE', 
+              'CVX', 'XOM','RKLB', 'SOFI', 'ENPH', 'TEM']
 tech_data = ''
 if HAS_YF:
     print("Fetching technical data...")
@@ -147,7 +151,7 @@ prompt = f"""คุณคือ AI ช่วยนักลงทุนไทย
 [ticker — วันที่ — EPS ถ้ามี]
 ━━━━━━━━━━━━━━━━━
 📌 ข่าว + ทิศทางหุ้น
-(ใส่ 10-15 ตัว แต่ละตัว 2-3 ประโยค + ทิศทาง)
+(ใส่ 15-20 ตัว แต่ละตัว 2-3 ประโยค + ทิศทาง)
 
 🟢📈 [ticker] $[ราคา] — [ข่าวดี + RSI + MA บอกทิศทาง]
 🔴📉 [ticker] $[ราคา] — [ข่าวร้าย + RSI + MA บอกทิศทาง]
