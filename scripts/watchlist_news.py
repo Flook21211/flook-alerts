@@ -63,7 +63,11 @@ watchlist: {', '.join(all_stocks)}
 resp = requests.post(
     f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}',
     json={'contents': [{'parts': [{'text': prompt}]}]}, timeout=30)
-msg = resp.json()['candidates'][0]['content']['parts'][0]['text'].strip()
+gemini_json = resp.json()
+print("Gemini response:", gemini_json)
+if 'candidates' not in gemini_json:
+    raise Exception(f"Gemini error: {gemini_json}")
+msg = gemini_json['candidates'][0]['content']['parts'][0]['text'].strip()
 
 r = requests.post('https://api.line.me/v2/bot/message/push',
     headers={'Content-Type':'application/json','Authorization':f'Bearer {LINE_TOKEN}'},
