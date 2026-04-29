@@ -1,4 +1,4 @@
-name: Earnings Alert (Monday 8am ICT)
+name: Earnings Alert
 
 on:
   workflow_dispatch:
