@@ -23,7 +23,7 @@ def search(q):
     try:
         r = requests.post('https://google.serper.dev/news',
             headers={'X-API-KEY': SERPER_API_KEY, 'Content-Type': 'application/json'},
-            json={'q': q, 'num': 5}, timeout=10)
+            json={'q': q, 'num': 10}, timeout=10)
         return '\n'.join([f"- {x['title']}: {x.get('snippet','')}" for x in r.json().get('news',[])[:5]])
     except: return '(ไม่พบข้อมูล)'
 
@@ -44,7 +44,7 @@ prompt = f"""คุณคือ AI ช่วยนักลงทุนไทย
 
 watchlist: {', '.join(all_stocks)}
 
-สร้างข้อความส่ง LINE ตามรูปแบบนี้ (ห้ามเกิน 1000 ตัวอักษร ตอบแค่ข้อความเท่านั้น):
+สร้างข้อความส่ง LINE ตามรูปแบบนี้ (ห้ามเกิน 1500 ตัวอักษร ตอบแค่ข้อความเท่านั้น):
 📊 Watchlist News Alert
 📅 {date_str}
 ━━━━━━━━━━━━━━━━━
@@ -57,13 +57,13 @@ watchlist: {', '.join(all_stocks)}
 ⚪ [ticker] — [ข่าวกลาง]
 ━━━━━━━━━━━━━━━━━
 🌍 Macro
-- [2-3 ข้อ]
+- [5 ข้อ]
 💡 จับตา: [...]"""
 
 resp = requests.post(
     'https://api.groq.com/openai/v1/chat/completions',
     headers={'Authorization': f'Bearer {GROQ_API_KEY}', 'Content-Type': 'application/json'},
-    json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt}], 'max_tokens': 1000},
+    json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt}], 'max_tokens': 2000},
     timeout=30)
 msg = resp.json()['choices'][0]['message']['content'].strip()
 
