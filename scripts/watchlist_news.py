@@ -61,7 +61,7 @@ watchlist: {', '.join(all_stocks)}
 💡 จับตา: [...]"""
 
 resp = requests.post(
-    f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}',
+    f'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}',
     json={'contents': [{'parts': [{'text': prompt}]}]}, timeout=30)
 gemini_json = resp.json()
 print("Gemini response:", gemini_json)
