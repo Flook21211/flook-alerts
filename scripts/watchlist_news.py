@@ -164,7 +164,7 @@ def call_groq(prompt_text):
 prompt_stocks = f"""คุณคือ AI ช่วยนักลงทุนไทย วันนี้คือ {date_str}
 
 ข้อมูลข่าว:
-{search_context}
+{stock_context}
 
 ข้อมูล Technical:
 {tech_data if tech_data else '(ไม่มีข้อมูล)'}
