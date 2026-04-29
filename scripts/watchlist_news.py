@@ -2,7 +2,7 @@ import os, json, requests
 from datetime import datetime
 import pytz
 
-GEMINI_API_KEY = os.environ['GEMINI_API_KEY']
+GROQ_API_KEY = os.environ['GROQ_API_KEY']
 SERPER_API_KEY = os.environ['SERPER_API_KEY']
 LINE_TOKEN = os.environ['LINE_TOKEN']
 LINE_USER_ID = os.environ['LINE_USER_ID']
@@ -44,7 +44,7 @@ prompt = f"""คุณคือ AI ช่วยนักลงทุนไทย
 
 watchlist: {', '.join(all_stocks)}
 
-สร้างข้อความส่ง LINE ตามรูปแบบนี้ (ห้ามเกิน 1000 ตัวอักษร ตอบแค่ข้อความ):
+สร้างข้อความส่ง LINE ตามรูปแบบนี้ (ห้ามเกิน 1000 ตัวอักษร ตอบแค่ข้อความเท่านั้น):
 📊 Watchlist News Alert
 📅 {date_str}
 ━━━━━━━━━━━━━━━━━
@@ -61,13 +61,11 @@ watchlist: {', '.join(all_stocks)}
 💡 จับตา: [...]"""
 
 resp = requests.post(
-    f'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}',
-    json={'contents': [{'parts': [{'text': prompt}]}]}, timeout=30)
-gemini_json = resp.json()
-print("Gemini response:", gemini_json)
-if 'candidates' not in gemini_json:
-    raise Exception(f"Gemini error: {gemini_json}")
-msg = gemini_json['candidates'][0]['content']['parts'][0]['text'].strip()
+    'https://api.groq.com/openai/v1/chat/completions',
+    headers={'Authorization': f'Bearer {GROQ_API_KEY}', 'Content-Type': 'application/json'},
+    json={'model': 'llama-3.3-70b-versatile', 'messages': [{'role': 'user', 'content': prompt}], 'max_tokens': 1000},
+    timeout=30)
+msg = resp.json()['choices'][0]['message']['content'].strip()
 
 r = requests.post('https://api.line.me/v2/bot/message/push',
     headers={'Content-Type':'application/json','Authorization':f'Bearer {LINE_TOKEN}'},
