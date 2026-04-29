@@ -1,0 +1,10 @@
+{
+  "watchlist": {
+    "stocks": {
+      "Growth": ["NVDA","MSFT","CRWD","PLTR","TSM","ASML","ARM","AMD","AVGO","AAPL","FICO","TSLA","AMZN","HIMS","META","GOOGL","NFLX"],
+      "Defensive": ["COST","LLY","NVO","ISRG","UNH","NEE","PEP","KO","WMT","PG","BRK.B","V","MRK","LMT","WM","DUK"],
+      "Dividend": ["PFE","CVX","XOM","O"],
+      "Speculative": ["RKLB","TEM","NVTS","NBIS","SOFI","ENPH","FSLR"]
+    }
+  }
+}
