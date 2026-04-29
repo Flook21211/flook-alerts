@@ -84,7 +84,13 @@ def get_tech_data(tickers):
             ma50_status = 'above MA50' if price > ma50 else 'below MA50'
             chg_str = f'+{chg}%' if chg >= 0 else f'{chg}%'
             rsi_str = f'RSI {rsi}' if rsi else 'RSI N/A'
-            lines.append(f"{ticker}: ${price} ({chg_str}) | {rsi_str} | {ma50_status}")
+            ma200 = round(hist['Close'].rolling(200).mean().iloc[-1], 2) if len(hist) >= 200 else None
+ma200_status = f" | {'above MA200' if price > ma200 else 'below MA200'}" if ma200 else ''
+avg_vol = int(hist['Volume'].rolling(20).mean().iloc[-1])
+today_vol = int(hist['Volume'].iloc[-1])
+vol_ratio = round(today_vol / avg_vol, 1) if avg_vol > 0 else 0
+vol_str = f"Vol {vol_ratio}x avg"
+lines.append(f"{ticker}: ${price} ({chg_str}) | {rsi_str} | {ma50_status}{ma200_status} | {vol_str}")
         except Exception as e:
             lines.append(f"{ticker}: (error: {e})")
     return '\n'.join(lines)
@@ -123,6 +129,7 @@ searches = {
     'Defensive': search_news(f'{defensive} stock news {today}', 5),
     'Dividend': search_news(f'{dividend} stock news {today}', 5),
     'Speculative': search_news(f'{speculative} stock news {today}', 5),
+    'Treasury': search_news(f'US treasury yield 10 year bond rate today {today}', 5),
 }
 
 search_context = '\n\n'.join([f"=== {k} ===\n{v}" for k, v in searches.items()])
