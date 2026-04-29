@@ -101,28 +101,39 @@ top_stocks = ' '.join(all_stocks[:15])
 
 # --- Run searches ---
 searches = {
-    'Fed/FOMC': search_news(f'Fed FOMC interest rate decision policy {month_year}', 10),
-    'BOT': search_news(f'Bank of Thailand interest rate monetary policy {month_year}', 5),
-    'US Market': search_news(f'US stock market S&P500 Nasdaq today {today}', 10),
-    'Gold': search_news(f'gold price XAU today {today}', 5),
-    'DXY': search_news(f'DXY dollar index US dollar strength today {today}', 5),
-    'USD/THB': search_news(f'USD THB dollar baht exchange rate today {today}', 5),
-    'VIX': search_news(f'VIX volatility fear index market today {today}', 5),
-    'Oil': search_news(f'crude oil WTI Brent price today {today}', 5),
-    'Earnings': search_news(f'earnings report results this week {top_stocks}', 10),
-    'Watchlist1': search_news(f'NVDA MSFT META GOOGL AAPL TSLA AVGO TSM stock news {today}', 10),
-    'Watchlist2': search_news(f'AMZN CRWD PLTR ARM AMD ASML NFLX COST stock news {today}', 10),
+    # แบ่งหุ้นเป็นกลุ่มย่อยสำหรับ search
+growth1 = 'NVDA MSFT CRWD PLTR TSM ASML ARM AMD AVGO AAPL FICO TSLA'
+growth2 = 'AMZN HIMS META GOOGL NFLX MRVL CSCO MU LRCX INTC'
+growth3 = 'SNPS CDNS ONTO AMAT KLAC PANW SHOP APP ZETA UBER'
+growth4 = 'EOSE ONDS ASTS BE NXT BA GE RTX ABBV OKLO'
+defensive = 'COST LLY NVO ISRG UNH NEE PEP KO WMT PG BRK.B V MRK LMT WM DUK'
+dividend = 'PFE CVX XOM O'
+speculative = 'RKLB TEM NVTS NBIS SOFI ENPH FSLR'
+
+searches = {
+    'Fed/FOMC': search_news(f'Fed FOMC interest rate decision policy {month_year}', 5),
+    'BOT': search_news(f'Bank of Thailand interest rate monetary policy {month_year}', 3),
+    'US Market': search_news(f'US stock market S&P500 Nasdaq today {today}', 5),
+    'Gold': search_news(f'gold price XAU today {today}', 3),
+    'DXY': search_news(f'DXY dollar index US dollar strength today {today}', 3),
+    'USD/THB': search_news(f'USD THB dollar baht exchange rate today {today}', 3),
+    'VIX': search_news(f'VIX volatility fear index market today {today}', 3),
+    'Oil': search_news(f'crude oil WTI Brent price today {today}', 3),
+    'Earnings': search_news(f'earnings report results this week {growth1}', 5),
+    'Growth1': search_news(f'{growth1} stock news {today}', 10),
+    'Growth2': search_news(f'{growth2} stock news {today}', 10),
+    'Growth3': search_news(f'{growth3} stock news {today}', 10),
+    'Growth4': search_news(f'{growth4} stock news {today}', 10),
+    'Defensive': search_news(f'{defensive} stock news {today}', 10),
+    'Dividend': search_news(f'{dividend} stock news {today}', 5),
+    'Speculative': search_news(f'{speculative} stock news {today}', 10),
+}
 }
 
 search_context = '\n\n'.join([f"=== {k} ===\n{v}" for k, v in searches.items()])
 
 # --- Fetch technical data for key stocks ---
-key_stocks = ['NVDA', 'MSFT', 'META', 'GOOGL', 'AAPL', 'TSLA', 'AVGO', 'TSM',
-              'AMZN', 'CRWD', 'PLTR', 'ARM', 'AMD', 'ASML', 'NFLX', 'COST',
-              'MRVL','CSCO','MU','LRCX','INTC','AMD','SNPS','CDNS','ONTO','AMAT',
-              'KLAC','EOSE','ONDS','ASTS','PANW','SHOP','BE','NXT','BA','GE','RTX',
-              'ABBV','APP','ZETA','UBER','OKLO','LLY', 'UNH', 'V', 'WMT', 'ISRG', 'PFE', 
-              'CVX', 'XOM','RKLB', 'SOFI', 'ENPH', 'TEM']
+key_stocks = all_stocks
 tech_data = ''
 if HAS_YF:
     print("Fetching technical data...")
