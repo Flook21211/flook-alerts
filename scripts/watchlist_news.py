@@ -99,8 +99,6 @@ month_year = now.strftime('%B %Y')
 today = now.strftime('%Y-%m-%d')
 top_stocks = ' '.join(all_stocks[:15])
 
-# --- Run searches ---
-searches = {
     # แบ่งหุ้นเป็นกลุ่มย่อยสำหรับ search
 growth1 = 'NVDA MSFT CRWD PLTR TSM ASML ARM AMD AVGO AAPL FICO TSLA'
 growth2 = 'AMZN HIMS META GOOGL NFLX MRVL CSCO MU LRCX INTC'
@@ -110,6 +108,7 @@ defensive = 'COST LLY NVO ISRG UNH NEE PEP KO WMT PG BRK.B V MRK LMT WM DUK'
 dividend = 'PFE CVX XOM O'
 speculative = 'RKLB TEM NVTS NBIS SOFI ENPH FSLR'
 
+# --- Run searches 
 searches = {
     'Fed/FOMC': search_news(f'Fed FOMC interest rate decision policy {month_year}', 5),
     'BOT': search_news(f'Bank of Thailand interest rate monetary policy {month_year}', 3),
