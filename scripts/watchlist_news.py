@@ -85,7 +85,8 @@ def get_tech_data(tickers):
             chg_str = f'+{chg}%' if chg >= 0 else f'{chg}%'
             rsi_str = f'RSI {rsi}' if rsi else 'RSI N/A'
             ma200 = round(hist['Close'].rolling(200).mean().iloc[-1], 2) if len(hist) >= 200 else None
-ma200_status = f" | {'above MA200' if price > ma200 else 'below MA200'}" if ma200 else ''
+ma200_label = 'above MA200' if price > ma200 else 'below MA200'
+ma200_status = f" | {ma200_label}" if ma200 else ''
 avg_vol = int(hist['Volume'].rolling(20).mean().iloc[-1])
 today_vol = int(hist['Volume'].iloc[-1])
 vol_ratio = round(today_vol / avg_vol, 1) if avg_vol > 0 else 0
