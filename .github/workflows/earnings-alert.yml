@@ -1,8 +1,6 @@
 name: Earnings Alert (Monday 8am ICT)
 
 on:
-  schedule:
-    - cron: '3 1 * * 1'
   workflow_dispatch:
 
 jobs:
