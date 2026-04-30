@@ -2,7 +2,7 @@ name: Watchlist News Alert (20.35 GMT)
 
 on:
   schedule:
-    - cron: '35 13 * * 1-5'
+    - cron: '40 13 * * 1-5'
   workflow_dispatch:
 
 jobs:
