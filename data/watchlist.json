@@ -3,7 +3,7 @@
     "stocks": {
       "Growth1": ["NVDA","MSFT","AVGO","AAPL","AMZN","META","GOOGL","TSM","ASML","LLY","NVO","FICO"],
       "Growth2": ["CRWD","PANW","PLTR","ARM","AMD","SNPS","CDNS","ANET","VRT","ETN","ISRG","NFLX"],
-      "Growth3": ["MRVL","KLAC","LRCX","AMAT","ONTO","MU","WDC","COHR","GLE","LITE","CSCO","INTC"],
+      "Growth3": ["MRVL","KLAC","LRCX","AMAT","ONTO","MU","WDC","COHR","GLE","LITE","INTC"],
       "Growth4": ["SHOP","UBER","APP","ZETA","HIM","TEM","SOFI","NXT","ENPH","FSLR","TSLA","BA"],
       "Defensive": ["COST","WMT","KO","PEP","PG","BRK.B","WM","UNH","MRK","ABBV","LMT","RTX"],
       "Dividend": ["O","CVX","XOM","PFE","DUK","NEE","V","GE","CSCO"],
