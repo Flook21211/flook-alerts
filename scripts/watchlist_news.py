@@ -161,7 +161,7 @@ def call_groq(prompt_text):
         json={
             'model': 'llama-3.3-70b-versatile',
             'messages': [{'role': 'user', 'content': prompt_text}],
-            'max_tokens': 3200,
+            'max_tokens': 3100,
             'temperature': 0.3
         },
         timeout=60
